@@ -1,0 +1,112 @@
+object PropertyForm: TPropertyForm
+  Left = 234
+  Height = 258
+  Top = 138
+  Width = 354
+  Caption = 'Property Viewer'
+  ClientHeight = 258
+  ClientWidth = 354
+  Color = clBtnFace
+  Font.Color = clWindowText
+  OnShow = FormShow
+  LCLVersion = '2.1.0.0'
+  object Panel1: TPanel
+    Left = 6
+    Height = 25
+    Top = 227
+    Width = 342
+    Align = alBottom
+    AutoSize = True
+    BorderSpacing.Left = 6
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 6
+    BorderSpacing.Bottom = 6
+    BevelOuter = bvNone
+    ClientHeight = 25
+    ClientWidth = 342
+    Font.Color = clWindowText
+    ParentFont = False
+    TabOrder = 0
+    object ColorViewer: TShape
+      Tag = 1
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = btnOK
+      AnchorSideBottom.Control = btnOK
+      AnchorSideBottom.Side = asrBottom
+      Left = 0
+      Height = 25
+      Top = 0
+      Width = 65
+      Anchors = [akTop, akLeft, akBottom]
+      Visible = False
+    end
+    object btnOK: TBitBtn
+      AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 267
+      Height = 25
+      Top = 0
+      Width = 75
+      Anchors = [akTop, akRight]
+      Caption = 'OK'
+      Default = True
+      Kind = bkOK
+      ModalResult = 1
+      TabOrder = 0
+    end
+  end
+  object Panel2: TPanel
+    Left = 6
+    Height = 215
+    Top = 6
+    Width = 342
+    Align = alClient
+    BorderSpacing.Left = 6
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 6
+    BevelOuter = bvNone
+    ClientHeight = 215
+    ClientWidth = 342
+    Font.Color = clWindowText
+    Font.Height = -11
+    ParentFont = False
+    TabOrder = 1
+    object lblParamName: TLabel
+      AnchorSideLeft.Control = Panel2
+      AnchorSideTop.Control = Panel2
+      Left = 0
+      Height = 13
+      Top = 0
+      Width = 81
+      Caption = 'lblParamName'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object ParamMemo: TMemo
+      AnchorSideLeft.Control = Panel2
+      AnchorSideTop.Control = lblParamName
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel2
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = Panel2
+      AnchorSideBottom.Side = asrBottom
+      Left = 0
+      Height = 198
+      Top = 17
+      Width = 342
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      BorderSpacing.Top = 4
+      Lines.Strings = (
+        ''
+      )
+      ReadOnly = True
+      ScrollBars = ssVertical
+      TabOrder = 0
+    end
+  end
+end
