@@ -5,7 +5,7 @@ unit peUtils;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, IniFiles;
 
 const
   MaxOleEnumIndex = 1000;
@@ -30,14 +30,16 @@ type
 
   TOleEnumArray = array[0..MaxOleEnumIndex] of TOleEnumItem;
 
-function  GetPowerpointVersion(PPTApp: OLEVariant) : integer;
+function GetPowerpointVersion(PPTApp: OLEVariant) : integer;
+procedure OriginalPictureSize(AShape: OLEVariant; out AWidth, AHeight:integer);
 
-function  PixelsToPoints(Pixels: Integer): Single;
-function  PointsToPixels(Points: double): Integer;
-function  PointsToCm(Points: double) : double;
+function PixelsToPoints(Pixels: Integer): Single;
+function PointsToPixels(Points: double): Integer;
+function PointsToCm(Points: double) : double;
 
 function IsRelativePath(const AFileName: string): boolean;
 
+function CreateIni: TCustomIniFile;
 
 implementation
 
@@ -54,6 +56,38 @@ begin
   ver := PptApp.Version;
   ver := copy(ver, 1, pos('.', ver) - 1);
   result := StrToInt(ver);
+end;
+
+procedure ResetPictureProperties(AShape: OLEVariant);
+// from: http://www.mvps.org/skp/ppt00044.htm#2
+begin
+  if AShape.&Type = msoPicture then
+  begin
+    AShape.LockAspectRatio := false;
+    AShape.ScaleWidth(1, true, msoScaleFromTopLeft);
+    AShape.ScaleHeight(1, true, msoScaleFromTopLeft);
+    AShape.LockAspectRatio := true;
+    AShape.PictureFormat.ColorType := msoPictureAutomatic;
+    AShape.PictureFormat.Brightness := 0.5;
+    AShape.PictureFormat.Contrast := 0.5;
+  end;
+end;
+
+procedure OriginalPictureSize(AShape: OLEVariant; out AWidth, AHeight:integer);
+var
+  sh: OLEVariant;
+begin
+  if AShape.&Type = msoPicture then
+  begin
+    sh := AShape.Duplicate;
+    ResetPictureProperties(sh);
+    AWidth := PointsToPixels(sh.Width);
+    AHeight := PointsToPixels(sh.Height);
+    sh.Delete;
+  end else begin
+    AWidth := -1;
+    AHeight := -1;
+  end;
 end;
 
 function PixelsPerInch: integer; inline;
@@ -81,6 +115,11 @@ begin
   Result := (Length(AFileName) > 1) and
     (not (AFileName[1] in [PathDelim, '~', '$'])) and
     (AFileName[2] <> DriveDelim);
+end;
+
+function CreateIni: TCustomIniFile;
+begin
+  Result := TMemIniFile.Create('./pptex.ini');
 end;
 
 end.

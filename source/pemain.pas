@@ -158,6 +158,9 @@ type
     function SelectShape(ANode: TTreeNode): OLEVariant;
     function SelectSlide(ANode: TTreeNode): OLEVariant;
 
+    procedure ReadIni;
+    procedure WriteIni;
+
   public
     property PowerPoint: OLEVariant read FPowerPoint;
 
@@ -171,7 +174,7 @@ implementation
 {$R *.lfm}
 
 uses
-  FileUtil, Variants, ComObj,
+  FileUtil, IniFiles, Variants, ComObj,
   peOffice, peUtils, pePropertyViewer;
 
 function GetRGBName(AColor: Integer): string;
@@ -396,7 +399,7 @@ begin
       end;
 
       try
-        DisplayHyperlinks(settings.Hyperlink);
+        DisplayValue('Hyperlink', settings.Hyperlink.Address, RO);
       except
         on E:Exception do DisplayError('Hyperlink', E.Message);
       end;
@@ -467,15 +470,12 @@ begin
         on E:Exception do DisplayError('Timing', E.Message);
       end;
 
-//      DisplayValue('Type', MsoAnimTypeStr(AValue.Type), RW);
+      DisplayValue('Type', MsoAnimTypeStr(AValue.&Type), RW);
     finally
       Items.EndUpdate;
     end;
   end;
 end;
-
-//------------------------------------------------------------------------------
-
 
 procedure TMainForm.DisplayAnimationSettings(ASettings:OLEVariant);
 var
@@ -591,9 +591,7 @@ begin
       end;
 
       try
-        {
-        DisplayValue('Type', MsoCalloutTypeStr(ACallout.Type), RW);
-        }
+        DisplayValue('Type', MsoCalloutTypeStr(ACallout.&Type), RW);
       except
         on E:Exception do
           DisplayError('Type', E.Message);
@@ -645,9 +643,7 @@ begin
       DisplayError(Prefix+'.From', E.Message);
   end;
   try
-    {
-    DisplayRGB(Prefix+'.To', AEffect.To, RW);
-    }
+    DisplayRGB(Prefix+'.To', AEffect.&To, RW);
   except
     on E:Exception do
       DisplayError(Prefix+'.To', E.Message);
@@ -1461,7 +1457,7 @@ begin
   end;
 
   try
-   { DisplayValue(Prefix+'.To', AEffect.To, RW);}
+    DisplayValue(Prefix+'.To', AEffect.&To, RW);
   except
     on E:Exception do
       DisplayError(Prefix+'.To', E.Message);
@@ -1496,7 +1492,7 @@ begin
   end;
 
   try
-    {DisplayValue(Prefix+'.To', AEffect.To, RW);}
+    DisplayValue(Prefix+'.To', AEffect.&To, RW);
   except
     on E:Exception do
       DisplayError(Prefix+'.To', E.Message);
@@ -1604,134 +1600,156 @@ begin
         except
           on E:Exception do DisplayError('AlternativeText', E.Message);
         end;
+
         try
           DisplayValue('AutoShapeType', MsoAutoShapeTypeStr(AShape.AutoShapeType), RW);
         except
           on E:Exception do DisplayError('AutoShapeType', E.Message);
         end;
+
         try
           DisplayValue('BlackWhiteMode', MsoBlackWhiteModeStr(AShape.BlackWhiteMode), RW);
         except
           on E:Exception do DisplayError('BlackWhiteMode', E.Message);
         end;
+
         try
           DisplayValue('Child', MsoTriStateStr(AShape.Child), RO);
         except
           on E:Exception do DisplayError('Child', E.Message);
         end;
+
         try
           DisplayValue('ConnectionSiteCount', AShape.ConnectionSiteCount, RO);
         except
           on E:Exception do DisplayError('ConnectionSiteCount', E.Message);
         end;
+
         try
           DisplayValue('Connector', MsoTriStateStr(AShape.Connector), RW);
         except
           on E:Exception do DisplayError('Connector', E.Message);
         end;
+
         try
           DisplayCreator(AShape.Creator);
         except
         end;
+
         try
           DisplayValue('HasDiagram', MsoTriStateStr(AShape.HasDiagram), RO);
         except
           on E:Exception do DisplayError('HasDiagram', E.Message);
         end;
+
         try
           DisplayValue('HasDiagramNode', MsoTriStateStr(AShape.HasDiagramNode), RO);
         except
           on E:Exception do DisplayError('HasDiagramNode', E.Message);
         end;
+
         try
           DisplayValue('HasTable', MsoTriStateStr(AShape.HasTable), RO);
         except
           on E:Exception do DisplayError('HasTable', E.Message);
         end;
+
         try
           DisplayValue('HasTextFrame', MsoTriStateStr(AShape.HasTextFrame), RO);
         except
           on E:Exception do DisplayError('HasTextFrame', E.Message);
         end;
+
         try
           DisplayPoints('Height', AShape.Height, RW);
         except
           on E:Exception do DisplayError('Height', E.Message);
         end;
+
         try
           DisplayValue('HorizontalFlip', MsoTriStateStr(AShape.HorizontalFlip), RO);
         except
           on E:Exception do DisplayError('HorizontalFlip', E.Message);
         end;
+
         try
           n := AShape.ID;
           DisplayValue('ID', Format('$%x (%d)', [n, n]), RO);
         except
           on E:Exception do DisplayError('ID', E.Message);
         end;
+
         try
           DisplayPoints('Left', AShape.Left, RW);
         except
           on E:Exception do DisplayError('Left', E.Message);
         end;
+
         try
           DisplayValue('LockAspectRatio', MsoTriStateStr(AShape.LockAspectRatio), RW);
         except
           on E:Exception do DisplayError('LockAspectRatio', E.Message);
         end;
+
         try
           DisplayValue('MediaType', PpMediaTypeStr(AShape.MediaType), RO);
         except
           on E:Exception do DisplayError('MediaType', E.Message);
         end;
+
         try
           DisplayValue('Name', AShape.Name, RW);
         except
           on E:Exception do DisplayError('Name', E.Message);
         end;
+
         try
-          {
-          DisplayValue('PlaceholderFormat.Type', PpPlaceHolderTypeStr(AShape.PlaceHolderFormat.Type), RO);
-          }
+          DisplayValue('PlaceholderFormat.Type', PpPlaceHolderTypeStr(AShape.PlaceHolderFormat.&Type), RO);
         except
           on E:Exception do DisplayError('PlaceholderFormat.Type', E.Message);
         end;
+
         try
           DisplayValue('Rotation', AShape.Rotation, RW);
         except
           on E:Exception do DisplayError('Rotation', E.Message);
         end;
+
         try
           DisplayPoints('Top', AShape.Top, RW);
         except
           on E:Exception do DisplayError('Top', E.Message);
         end;
+
         try
-          {DisplayValue('Type', MsoShapeTypeStr(AShape.Type), RO);}
+          DisplayValue('Type', MsoShapeTypeStr(AShape.&Type), RO);
         except
           on E:Exception do DisplayError('Type', E.Message);
         end;
+
         try
           DisplayValue('VerticalFlip', MsoTriStateStr(AShape.VerticalFlip), RO);
         except
           on E:Exception do DisplayError('VerticalFlip', E.Message);
         end;
+
         try
           DisplayPoints('Width', AShape.Width, RW);
         except
           on E:Exception do DisplayError('Width', E.Message);
         end;
+
         try
           DisplayValue('ZOrderPosition', AShape.ZOrderPosition, RO);
         except
           on E:Exception do DisplayError('ZOrderPosition', E.Message);
         end;
-        {
-        if AShape.Type=msoPicture then begin
+
+        if AShape.&Type=msoPicture then begin
           OriginalPictureSize(AShape, w, h);
           DisplayValue('*** Original Picture Size ***', Format('%d x %d picels', [w, h]), RO);
         end;
-        }
+
   //      DisplayProperty(' *** MemoryUsage ***', Format('%0.2n KB', [1.0*GetShapeMemSize(AShape)/1024]));
       end;
     finally
@@ -1884,9 +1902,7 @@ begin
   except
     DisplayError('SoundEffect.Name', '*** kein Sound ***');
   end;
-  {
-  DisplayValue('SoundEffect.Type', PpSoundEffectTypeStr(AEffect.Type), RW);
-  }
+  DisplayValue('SoundEffect.Type', PpSoundEffectTypeStr(AEffect.&Type), RW);
 end;
 
 procedure TMainForm.DisplayTextEffect(ATextEffect: OLEVariant);
@@ -2284,12 +2300,10 @@ begin
        Result := shape;
        exit;
      end else
-     {
-     if (shape.Type=msoGroup) then begin
+     if (shape.&Type=msoGroup) then begin
        result := FindShape(shape.GroupItems, AShapeName);
        if not VarIsEmpty(result) then exit;
-     end}
-     ;
+     end;
   end;
 end;
 
@@ -2378,11 +2392,14 @@ var
   R: TRect;
   bmp: TBitmap;
 begin
+  FActSlideID := -1;
+
+  ReadIni;
+
   try
     FShowErrorItems := CbShowErrorItems.Checked;
     SystemParametersInfo(SPI_GETWORKAREA, 0, @R, 0);
 //    R := Screen.WorkAreaRect;
-    FActSlideID := -1;
     SetBounds(R.Left, R.Top, R.Bottom - R.Top, (R.Right - R.Left) div 2);
     try
       FPowerPoint := GetActiveOleObject('PowerPoint.Application');
@@ -2437,6 +2454,8 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  WriteIni;
+
   try
     FTestPresentation.Close;
     FTestPresentation := UnAssigned;
@@ -2600,16 +2619,12 @@ begin
       5 : if (Node.Parent.Parent.Text = 'Shapes') then begin
             shape := SelectShape(Node.Parent);
             if (Node.Text = 'ActionSettings (ppMouseClick)') then begin
-              {
-              if shape.Type<>msoGroup then
+              if shape.&Type <> msoGroup then
                 DisplayActionSettings(shape.ActionSettings, ppMouseClick);
-              }
             end else
             if (Node.Text = 'ActionSettings (ppMouseOver)') then begin
-              {
-              if shape.Type<>msoGroup then
+              if shape.&Type <> msoGroup then
                 DisplayActionSettings(shape.ActionSettings, ppMouseOver);
-                }
             end else
             if (Node.Text = 'AnimationSettings') then
               DisplayAnimationSettings(shape.AnimationSettings)
@@ -2683,17 +2698,13 @@ begin
             shape := SelectShape(Node.Parent);
             if (Node.Text = 'ActionSettings (ppMouseClick)') then
             begin
-              {
-              if shape.Type <> msoGroup then
+              if shape.&Type <> msoGroup then
                 DisplayActionSettings(shape.ActionSettings, ppMouseClick);
-              }
             end else
             if (Node.Text = 'ActionSettings (ppMouseOver)') then
             begin
-              {
-              if shape.Type <> msoGroup then
+              if shape.&Type <> msoGroup then
                 DisplayActionSettings(shape.ActionSettings, ppMouseOver);
-              }
             end else
             if (Node.Text = 'AnimationSettings') then
               DisplayAnimationSettings(shape.AnimationSettings)
@@ -2823,8 +2834,7 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
     n, i: integer;
   begin
     groupshape := FindShape(ANode.Parent);
-    {
-    if groupshape.Type = msoGroup then begin
+    if groupshape.&Type = msoGroup then begin
       n := groupshape.GroupItems.Count;
       if n > 0 then begin
         for i := 1 to n do begin
@@ -2833,7 +2843,6 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
         end;
       end;
     end;
-    }
   end;
 
   procedure AddMaster(AMastersNode: TTreeNode; AMaster: OLEVariant;
@@ -2860,10 +2869,10 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
       AMaster := FActPresentation.HandoutMaster
     else
       exit;
-    {
+
     for i := 1 to AMaster.Shapes.Count do begin
       shape := AMaster.Shapes.Item(i);
-      st := Shape.Type;
+      st := Shape.&Type;
       shapeNode := TreeView.Items.AddChild(ANode, shape.Name);
       with shapeNode do begin
         ImageIndex := 1;
@@ -2875,25 +2884,23 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
           HasChildren := true;
       end;
     end;
-    }
   end;
 
   procedure AddShape(ANode: TTreeNode; Shape: OLEVariant);
   // try-except due to  "DefaultShape"
   begin
-    {
     try
-      if Shape.Type <> msoGroup then
+      if Shape.&Type <> msoGroup then
         AddChildNode(ANode, 'ActionSettings (ppMouseClick)', 23, false);
     except
     end;
 
     try
-      if shape.Type <> msoGroup then
+      if shape.&Type <> msoGroup then
         AddChildNode(ANode, 'ActionSettings (ppMouseOver)', 23, false);
     except
     end;
-    }
+
     try
       AddChildNode(ANode, 'AnimationSettings', 15, false);
     except
@@ -2915,23 +2922,20 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
     except
     end;
 
-    {
     try
-      if (Shape.Type = msoGroup) then
+      if (Shape.&Type = msoGroup) then
         AddChildNode(ANode, 'GroupItems', 1, shape.GroupItems.Count>0);
     except
     end;
-    }
 
     try
       AddChildNode(ANode, 'LinkFormat', 31, false);
     except
     end;
-    {
     try
-      if (Shape.Type = msoEmbeddedOLEObject)
-        or (Shape.Type = msoOLEControlObject)
-        or (Shape.Type = msoLinkedOLEObject) then
+      if (Shape.&Type = msoEmbeddedOLEObject)
+        or (Shape.&Type = msoOLEControlObject)
+        or (Shape.&Type = msoLinkedOLEObject) then
       begin
         AddChildNode(ANode, 'OLEFormat', 10, false);
       end;
@@ -2939,22 +2943,22 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
     end;
 
     try
-      if (Shape.Type = msoPicture) or (Shape.Type = msoLinkedPicture) then
+      if (Shape.&Type = msoPicture) or (Shape.&Type = msoLinkedPicture) then
         AddChildNode(ANode, 'PictureFormat', 11, false);
     except
     end;
-    }
+
     try
       AddChildNode(ANode, 'Shadow', 14, false);
     except
     end;
-    {
+
     try
-      if (Shape.Type = msoTextEffect) then
+      if (Shape.&Type = msoTextEffect) then
         AddChildNode(ANode, 'TextEffect', 13, false);
     except
     end;
-    }
+
     try
       if (Shape.HasTextFrame) and (Shape.TextFrame.HasText) then
         AddChildNode(ANode, 'TextFrame', 12, false);
@@ -3152,6 +3156,18 @@ begin
   end;
 end;
 
+procedure TMainForm.ReadIni;
+var
+  ini: TCustomIniFile;
+begin
+  ini := CreateIni;
+  try
+    cbShowerrorItems.Checked := ini.ReadBool('MainForm', 'ShowErrorItems', cbShowErrorItems.Checked);
+  finally
+    ini.Free;
+  end;
+end;
+
 function TMainForm.SelectEffect(ANode: TTreeNode): OLEVariant;
 var
   seq: OLEVariant;
@@ -3340,6 +3356,18 @@ begin
   else
   if AValue and (not already_dirty) then
     ANode.Text := ANode.Text + ' [*]';
+end;
+
+procedure TMainForm.WriteIni;
+var
+  ini: TCustomIniFile;
+begin
+  ini := CreateIni;
+  try
+    ini.WriteBool('MainForm', 'ShowErrorItems', cbShowErrorItems.Checked);
+  finally
+    ini.Free;
+  end;
 end;
 
 end.
