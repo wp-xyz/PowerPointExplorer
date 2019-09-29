@@ -18,6 +18,7 @@ type
     acFileSaveAs: TAction;
     acEditCopy: TAction;
     acEditLink: TAction;
+    acHelpAbout: TAction;
     acViewCollapseAll: TAction;
     acViewExpandAll: TAction;
     ActionList: TActionList;
@@ -30,6 +31,8 @@ type
     LblReadOnly: TLabel;
     LblReadWrite: TLabel;
     MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    mnuHelp: TMenuItem;
     mnuEditLink: TMenuItem;
     mnuEditCopy: TMenuItem;
     mnuEdit: TMenuItem;
@@ -66,6 +69,7 @@ type
     procedure acFileExitExecute(Sender: TObject);
     procedure acFileOpenExecute(Sender: TObject);
     procedure acFileSaveAsExecute(Sender: TObject);
+    procedure acHelpAboutExecute(Sender: TObject);
     procedure ActionListUpdate(AAction: TBasicAction; var Handled: Boolean);
     procedure acViewCollapseAllExecute(Sender: TObject);
     procedure acViewExpandAllExecute(Sender: TObject);
@@ -176,7 +180,7 @@ implementation
 
 uses
   FileUtil, IniFiles, Variants, ComObj,
-  peOffice, peUtils, pePropertyViewer;
+  peOffice, peUtils, pePropertyViewer, peAbout;
 
 function GetRGBName(AColor: Integer): string;
 type
@@ -290,6 +294,19 @@ begin
       FActPresentation.SaveCopyAs(FileName);
       SetDirty(Treeview.Selected, false);
     end;
+  end;
+end;
+
+procedure TMainForm.acHelpAboutExecute(Sender: TObject);
+var
+  F: TAboutForm;
+begin
+  F := TAboutForm.Create(nil);
+  try
+    F.Position := poMainFormCenter;
+    F.ShowModal;
+  finally
+    F.Free;
   end;
 end;
 

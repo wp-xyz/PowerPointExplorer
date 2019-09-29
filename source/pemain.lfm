@@ -523,6 +523,12 @@ object MainForm: TMainForm
       Hint = 'Edit link'
       OnExecute = acEditLinkExecute
     end
+    object acHelpAbout: TAction
+      Category = 'Help'
+      Caption = 'About...'
+      Hint = 'About|Information about this program'
+      OnExecute = acHelpAboutExecute
+    end
   end
   object MainMenu: TMainMenu
     Images = ImageList
@@ -566,6 +572,12 @@ object MainForm: TMainForm
       end
       object mnuViewCollapseAll: TMenuItem
         Action = acViewCollapseAll
+      end
+    end
+    object mnuHelp: TMenuItem
+      Caption = 'Help'
+      object MenuItem3: TMenuItem
+        Action = acHelpAbout
       end
     end
   end

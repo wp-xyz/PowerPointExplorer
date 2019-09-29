@@ -64,6 +64,14 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="pePropertyViewer"/>
       </Unit>
+      <Unit>
+        <Filename Value="peabout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AboutForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="peAbout"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
