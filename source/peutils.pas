@@ -1,6 +1,6 @@
 unit peUtils;
 
-{$mode objfpc}{$H+}
+{$mode Delphi}
 
 interface
 
@@ -40,11 +40,13 @@ function PointsToCm(Points: double) : double;
 function IsRelativePath(const AFileName: string): boolean;
 
 function CreateIni: TCustomIniFile;
+function GetScreenWorkAreaRect: TRect;
+
 
 implementation
 
 uses
-  Graphics;
+  Graphics, LCLIntf, LCLType, Forms;
 
 const
   INCH = 2.54;     // 1" = 2.54 cm
@@ -120,6 +122,18 @@ end;
 function CreateIni: TCustomIniFile;
 begin
   Result := TMemIniFile.Create('./pptex.ini');
+end;
+
+function GetScreenWorkAreaRect: TRect;
+begin
+  Result := Screen.WorkAreaRect;
+  if (Result.Left = 0) and (Result.Right = Screen.Width) and (Result.Top = 0) and (Result.Bottom = Screen.Height) then
+    // no Taskbar
+  else
+  begin
+    Result.Left -= GetSystemMetrics(SM_CXSIZEFRAME);
+    Result.Bottom -= GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYCAPTION);
+  end;
 end;
 
 end.

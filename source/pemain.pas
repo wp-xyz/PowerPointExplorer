@@ -69,6 +69,7 @@ type
     procedure ActionListUpdate(AAction: TBasicAction; var Handled: Boolean);
     procedure acViewCollapseAllExecute(Sender: TObject);
     procedure acViewExpandAllExecute(Sender: TObject);
+    procedure CbShowErrorItemsChange(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -364,6 +365,11 @@ begin
   finally
     Screen.Cursor := crs;
   end;
+end;
+
+procedure TMainForm.CbShowErrorItemsChange(Sender: TObject);
+begin
+  FShowErrorItems := CbShowErrorItems.Checked;
 end;
 
 procedure TMainForm.DisplayActionSettings(ASettings: OLEVariant; AIndex: Integer);
@@ -2391,6 +2397,7 @@ procedure TMainForm.FormCreate(Sender: TObject);
 var
   R: TRect;
   bmp: TBitmap;
+  h: Integer;
 begin
   FActSlideID := -1;
 
@@ -2398,9 +2405,8 @@ begin
 
   try
     FShowErrorItems := CbShowErrorItems.Checked;
-    SystemParametersInfo(SPI_GETWORKAREA, 0, @R, 0);
-//    R := Screen.WorkAreaRect;
-    SetBounds(R.Left, R.Top, R.Bottom - R.Top, (R.Right - R.Left) div 2);
+    R := GetScreenWorkAreaRect;
+    SetBounds(R.Left, R.Top, (R.Right - R.Left) div 2, R.Bottom - R.Top);
     try
       FPowerPoint := GetActiveOleObject('PowerPoint.Application');
       FPowerpointRunning := true;
@@ -2420,10 +2426,11 @@ begin
     FPowerpointLeft := FPowerpoint.Left;
     FPowerpointTop := FPowerpoint.Top;
     try
-      FPowerpoint.Left := PixelsToPoints(Width);
+      FPowerpoint.Left := PixelsToPoints(R.Left + Width + GetSystemMetrics(SM_CXSIZEFRAME));
       FPowerpoint.Top := PixelsToPoints(R.Top);
-      FPowerpoint.Width := PixelsToPoints(Screen.Width) - Powerpoint.Left;
-      FPowerpoint.Height := PixelsToPoints(Height);
+      FPowerpoint.Width := PixelsToPoints(R.Right - R.Left) - Powerpoint.Left;
+      h := R.Bottom - R.Top + GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYCAPTION);
+      FPowerpoint.Height := PixelsToPoints(h);
     except
       // Exception raised when PPT already has been opened maximized.
     end;
@@ -3163,6 +3170,7 @@ begin
   ini := CreateIni;
   try
     cbShowerrorItems.Checked := ini.ReadBool('MainForm', 'ShowErrorItems', cbShowErrorItems.Checked);
+    FShowErrorItems := cbShowErrorItems.Checked;
   finally
     ini.Free;
   end;
@@ -3364,7 +3372,7 @@ var
 begin
   ini := CreateIni;
   try
-    ini.WriteBool('MainForm', 'ShowErrorItems', cbShowErrorItems.Checked);
+    ini.WriteBool('MainForm', 'ShowErrorItems', FShowErrorItems);
   finally
     ini.Free;
   end;

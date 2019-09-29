@@ -205,6 +205,7 @@ object MainForm: TMainForm
         Width = 109
         BorderSpacing.Top = 2
         Caption = 'Show error items'
+        OnChange = CbShowErrorItemsChange
         TabOrder = 0
       end
     end
