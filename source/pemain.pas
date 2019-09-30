@@ -25,11 +25,13 @@ type
     Bevel1: TBevel;
     CbShowErrorItems: TCheckBox;
     ImageList: TImageList;
-    ImgReadOnly: TImage;
-    ImgReadWrite: TImage;
-    Label1: TLabel;
-    LblReadOnly: TLabel;
-    LblReadWrite: TLabel;
+    imgReadOnly: TImage;
+    imgError: TImage;
+    imgReadWrite: TImage;
+    lblLegend: TLabel;
+    lblReadOnly: TLabel;
+    LblReadOnly1: TLabel;
+    lblReadWrite: TLabel;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     mnuHelp: TMenuItem;
@@ -1382,7 +1384,7 @@ begin
         on E:Exception do DisplayError('EnvelopeVisible', E.Message);
       end;
 
-      DisplayValue('ExtraColors', '*** ExtraColors noch nicht implementiert. ***', RO);
+      DisplayValue('ExtraColors', '*** ExtraColors not yet implemented. ***', RO);
       Displayvalue('FullName', APresentation.FullName, RO);
 
       try
@@ -2458,7 +2460,7 @@ begin
     bmp := TBitmap.Create;
     try
       TreeviewImages.GetBitmap(IMG_INDEX_READONLY, bmp);
-      ImgReadOnly.Picture.Assign(bmp);
+      imgReadOnly.Picture.Assign(bmp);
     finally
       bmp.Free;
     end;
@@ -2466,7 +2468,15 @@ begin
     bmp := TBitmap.Create;
     try
       TreeViewImages.GetBitmap(IMG_INDEX_READWRITE, bmp);
-      ImgReadWrite.Picture.Assign(bmp);
+      imgReadWrite.Picture.Assign(bmp);
+    finally
+      bmp.Free;
+    end;
+
+    bmp := TBitmap.Create;
+    try
+      TreeViewImages.GetBitmap(IMG_INDEX_ERROR, bmp);
+      imgError.Picture.Assign(bmp);
     finally
       bmp.Free;
     end;
@@ -2788,13 +2798,13 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
 
   procedure AddFirstNode(ANode: TTreeNode);
   begin
-    AddChildNode(ANode, 'BuiltInDocumentProperties', 9, false);
-    AddChildNode(ANode, 'CustomDocumentProperties', 9, false);
-    AddChildNode(ANode, 'DefaultShape', 1, true);
-    AddChildNode(ANode, 'Masters', 19, true);
-    AddChildNode(ANode, 'PageSetup', 18, false);
-    AddChildNode(ANode, 'Slides', 3, FActPresentation.Slides.Count > 0);
-    AddChildNode(ANode, 'SlideshowSettings', 17, false);
+    AddChildNode(ANode, 'BuiltInDocumentProperties', IMG_INDEX_PROPERTIES, false);
+    AddChildNode(ANode, 'CustomDocumentProperties', IMG_INDEX_PROPERTIES, false);
+    AddChildNode(ANode, 'DefaultShape', IMG_INDEX_SHAPE, true);
+    AddChildNode(ANode, 'Masters', IMG_INDEX_MASTER, true);
+    AddChildNode(ANode, 'PageSetup', IMG_INDEX_PAGE_SETUP, false);
+    AddChildNode(ANode, 'Slides', IMG_INDEX_SLIDE, FActPresentation.Slides.Count > 0);
+    AddChildNode(ANode, 'SlideshowSettings', IMG_INDEX_SLIDE_SHOW_SETTINGS, false);
   end;
 
   procedure AddHeaderFooter(ANode: TTreeNode; const AName: string);
@@ -2802,15 +2812,15 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
     with TreeView.Items.AddChild(ANode, AName) do
     begin
       if AName = 'DateAndTime' then
-        ImageIndex := 6
+        ImageIndex := IMG_INDEX_DATE_TIME
       else if AName='SlideNumber' then
-        ImageIndex := 5
+        ImageIndex := IMG_INDEX_SLIDE_NUMBER
       else if AName='Header' then
-        ImageIndex := 7
+        ImageIndex := IMG_INDEX_HEADER
       else if AName='Footer' then
-        ImageIndex := 8
+        ImageIndex := IMG_INDEX_FOOTER
       else
-        ImageIndex := 4;
+        ImageIndex := IMG_INDEX_HEADER_FOOTER;
       SelectedIndex := ImageIndex;
     end;
   end;
@@ -2830,8 +2840,8 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
       SlideNode := TreeView.Items.AddChildObject(ASlidesNode, s,
         pointer(PtrInt(Slide.SlideID)));
       with SlideNode do begin
-        ImageIndex := 3;
-        SelectedIndex := 3;
+        ImageIndex := IMG_INDEX_SLIDE;
+        SelectedIndex := IMG_INDEX_SLIDE;
         HasChildren := (slide.Shapes.Count > 0);
       end;
     end;
@@ -2847,7 +2857,7 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
     slide := FindSlide(ANode);
     for i := 1 to slide.Shapes.Count do begin
       Shape := Slide.Shapes.Item(i);
-      AddChildNode(ANode, Shape.Name, 1, true);
+      AddChildNode(ANode, Shape.Name, IMG_INDEX_SHAPE, true);
     end;
   end;
 
@@ -2863,7 +2873,7 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
       if n > 0 then begin
         for i := 1 to n do begin
           shape := groupshape.GroupItems.Item(i);
-          AddChildNode(ANode, shape.Name, 1, true);
+          AddChildNode(ANode, shape.Name, IMG_INDEX_SHAPE, true);
         end;
       end;
     end;
@@ -2872,7 +2882,7 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
   procedure AddMaster(AMastersNode: TTreeNode; AMaster: OLEVariant;
     AMasterName: string);
   begin
-    AddChildNode(AMastersNode, AMasterName, 19, AMaster.Shapes.Count > 0);
+    AddChildNode(AMastersNode, AMasterName, IMG_INDEX_MASTER, AMaster.Shapes.Count > 0);
   end;
 
   procedure AddMasterShapes(ANode: TTreeNode);
@@ -2899,8 +2909,8 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
       st := Shape.&Type;
       shapeNode := TreeView.Items.AddChild(ANode, shape.Name);
       with shapeNode do begin
-        ImageIndex := 1;
-        SelectedIndex := 1;
+        ImageIndex := IMG_INDEX_SHAPE;
+        SelectedIndex := IMG_INDEX_SHAPE;
         HasChildren := (st in [msoPicture, msoLinkedPicture,
           msoEmbeddedOLEObject, msoLinkedOLEObject, msoOLEControlObject,
           msoTextEffect, msoGroup]);
@@ -2915,45 +2925,45 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
   begin
     try
       if Shape.&Type <> msoGroup then
-        AddChildNode(ANode, 'ActionSettings (ppMouseClick)', 23, false);
+        AddChildNode(ANode, 'ActionSettings (ppMouseClick)', IMG_INDEX_ACTION_SETTINGS, false);
     except
     end;
 
     try
       if shape.&Type <> msoGroup then
-        AddChildNode(ANode, 'ActionSettings (ppMouseOver)', 23, false);
+        AddChildNode(ANode, 'ActionSettings (ppMouseOver)', IMG_INDEX_ACTION_SETTINGS, false);
     except
     end;
 
     try
-      AddChildNode(ANode, 'AnimationSettings', 15, false);
+      AddChildNode(ANode, 'AnimationSettings', IMG_INDEX_ANIMATION_SETTINGS, false);
     except
     end;
 
     try
-      AddChildNode(ANode, 'Callout', 24, false);
+      AddChildNode(ANode, 'Callout', IMG_INDEX_CALLOUT, false);
     except
     end;
 
     try
       if Shape.HasDiagram then
-        AddChildNode(ANode, 'Diagram', 25, false);
+        AddChildNode(ANode, 'Diagram', IMG_INDEX_DIAGRAM, false);
     except
     end;
 
     try
-      AddChildNode(ANode, 'Fill', 20, false);
+      AddChildNode(ANode, 'Fill', IMG_INDEX_FILL, false);
     except
     end;
 
     try
       if (Shape.&Type = msoGroup) then
-        AddChildNode(ANode, 'GroupItems', 1, shape.GroupItems.Count>0);
+        AddChildNode(ANode, 'GroupItems', IMG_INDEX_SHAPE, shape.GroupItems.Count>0);
     except
     end;
 
     try
-      AddChildNode(ANode, 'LinkFormat', 31, false);
+      AddChildNode(ANode, 'LinkFormat', IMG_INDEX_LINK, false);
     except
     end;
     try
@@ -2961,31 +2971,31 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
         or (Shape.&Type = msoOLEControlObject)
         or (Shape.&Type = msoLinkedOLEObject) then
       begin
-        AddChildNode(ANode, 'OLEFormat', 10, false);
+        AddChildNode(ANode, 'OLEFormat', IMG_INDEX_OLE_FORMAT, false);
       end;
     except
     end;
 
     try
       if (Shape.&Type = msoPicture) or (Shape.&Type = msoLinkedPicture) then
-        AddChildNode(ANode, 'PictureFormat', 11, false);
+        AddChildNode(ANode, 'PictureFormat', IMG_INDEX_PICTURE_FORMAT, false);
     except
     end;
 
     try
-      AddChildNode(ANode, 'Shadow', 14, false);
+      AddChildNode(ANode, 'Shadow', IMG_INDEX_SHADOW, false);
     except
     end;
 
     try
       if (Shape.&Type = msoTextEffect) then
-        AddChildNode(ANode, 'TextEffect', 13, false);
+        AddChildNode(ANode, 'TextEffect', IMG_INDEX_TEXT_EFFECT, false);
     except
     end;
 
     try
       if (Shape.HasTextFrame) and (Shape.TextFrame.HasText) then
-        AddChildNode(ANode, 'TextFrame', 12, false);
+        AddChildNode(ANode, 'TextFrame', IMG_INDEX_TEXT_FRAME, false);
     except
     end;
   end;
@@ -2994,9 +3004,9 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
   var
     i: integer;
   begin
-    AddChildNode(ANode, 'MainSequence', 28, true);
+    AddChildNode(ANode, 'MainSequence', IMG_INDEX_SEQUENCE, true);
     for i := 1 to ATimeLine.InterActiveSequences.Count do
-      AddChildNode(ANode, Format('InteractiveSequence.Item(%d)', [i]), 28, true);
+      AddChildNode(ANode, Format('InteractiveSequence.Item(%d)', [i]), IMG_INDEX_SEQUENCE, true);
   end;
 
   procedure AddSequence(ANode: TTreeNode; ATimeLine: OLEVariant);
@@ -3014,7 +3024,7 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
       seq := ATimeLine.InteractiveSequences.Item(StrToInt(nr));
     end;
     for i:=1 to seq.Count do
-      AddChildNode(ANode, Format('Effect #%d', [i]), 27, true);
+      AddChildNode(ANode, Format('Effect #%d', [i]), IMG_INDEX_EFFECT, true);
   end;
 
   procedure AddBehaviors(ANode: TTreeNode);
@@ -3024,7 +3034,7 @@ procedure TMainForm.TreeViewExpanding(Sender: TObject; ANode: TTreeNode;
   begin
     eff := SelectEffect(ANode);
     for i := 1 to eff.Behaviors.Count do
-      AddChildNode(ANode, Format('Behaviors.Item(%d)', [i]), 30, false);
+      AddChildNode(ANode, Format('Behaviors.Item(%d)', [i]), IMG_INDEX_STAR, false);
   end;
 
 var
@@ -3054,19 +3064,19 @@ begin
             AddShape(ANode, FActPresentation.DefaultShape);
       2 : if (ANode.Parent.Text = 'Slides') then
           begin
-            AddChildNode(ANode, 'HeadersFooters', 4, true);
+            AddChildNode(ANode, 'HeadersFooters', IMG_INDEX_HEADER_FOOTER, true);
             if GetPowerpointVersion(Powerpoint) >= 10 then
-              AddChildNode(ANode, 'Sequences', 28, true);
-            AddChildNode(ANode, 'Shapes', 1, true);
-            AddChildNode(ANode, 'SlideshowTransition', 16, false);
+              AddChildNode(ANode, 'Sequences', IMG_INDEX_SEQUENCE, true);
+            AddChildNode(ANode, 'Shapes', IMG_INDEX_SHAPE, true);
+            AddChildNode(ANode, 'SlideshowTransition', IMG_INDEX_SLIDESHOW_TRANSITION, false);
           end else
           if (ANode.Parent.Text = 'Masters') then
           begin
-            AddChildNode(ANode, 'HeadersFooters', 4, true);
+            AddChildNode(ANode, 'HeadersFooters', IMG_INDEX_HEADER_FOOTER, true);
             if GetPowerpointVersion(Powerpoint) >= 10 then
-              AddChildNode(ANode, 'Sequences', 28, true);
-            AddChildNode(ANode, 'Shapes', 1, true);
-            AddChildNode(ANode, 'SlideshowTransition', 16, false);
+              AddChildNode(ANode, 'Sequences', IMG_INDEX_SEQUENCE, true);
+            AddChildNode(ANode, 'Shapes', IMG_INDEX_SHAPE, true);
+            AddChildNode(ANode, 'SlideshowTransition', IMG_INDEX_SLIDESHOW_TRANSITION, false);
           end;
       3 : if (ANode.Text = 'HeadersFooters') then
           begin
@@ -3075,7 +3085,7 @@ begin
             AddHeaderFooter(ANode, 'Header');
             AddHeaderFooter(ANode, 'SlideNumber');
           end else
-          if (ANode.Text='Shapes') then
+          if (ANode.Text = 'Shapes') then
           begin
             if ANode.Parent.Parent.Text = 'Slides' then
               AddSlideShapes(ANode)
@@ -3106,7 +3116,7 @@ begin
           if (ANode.Parent.Parent.Text = 'Sequences') then
           begin
             AddBehaviors(ANode);
-            AddChildNode(ANode, 'EffectInformation', 29, false);
+            AddChildNode(ANode, 'EffectInformation', IMG_INDEX_EFFECT_INFORMATION, false);
           end;
       6 : if (ANode.Parent.Text = 'GroupItems') then
           begin
@@ -3168,8 +3178,8 @@ begin
       TObject(PtrInt(APresentationIndex))
     );
     with PresNode do begin
-      ImageIndex := 0;
-      SelectedIndex := 0;
+      ImageIndex := IMG_INDEX_POWERPOINT;
+      SelectedIndex := IMG_INDEX_POWERPOINT;
       HasChildren := true;
       Expanded := true;
       Selected := true;
