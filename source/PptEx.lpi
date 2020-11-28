@@ -23,15 +23,14 @@
     </PublishOptions>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="2">
-      <Item1>
+    <RequiredPackages>
+      <Item>
         <PackageName Value="lazmrumenu"/>
-      </Item1>
-      <Item2>
+      </Item>
+      <Item>
         <PackageName Value="LCL"/>
-      </Item2>
+      </Item>
     </RequiredPackages>
     <Units>
       <Unit>
@@ -90,6 +89,9 @@
       </SyntaxOptions>
     </Parsing>
     <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf2"/>
+      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>
@@ -98,22 +100,22 @@
     </Linking>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="5">
-      <Item1>
+    <Exceptions>
+      <Item>
         <Name Value="EAbort"/>
-      </Item1>
-      <Item2>
+      </Item>
+      <Item>
         <Name Value="ECodetoolError"/>
-      </Item2>
-      <Item3>
+      </Item>
+      <Item>
         <Name Value="EFOpenError"/>
-      </Item3>
-      <Item4>
+      </Item>
+      <Item>
         <Name Value="EOleSysError"/>
-      </Item4>
-      <Item5>
+      </Item>
+      <Item>
         <Name Value="EOleException"/>
-      </Item5>
+      </Item>
     </Exceptions>
   </Debugging>
 </CONFIG>
