@@ -57,7 +57,6 @@ type
     mnuFile: TMenuItem;
     mnuFileOpen: TMenuItem;
     mnuFileExit: TMenuItem;
-    MRUMenuManager: TMRUMenuManager;
     Panel1: TPanel;
     Panel2: TPanel;
     RecentFilesPopup: TPopupMenu;
@@ -93,6 +92,7 @@ type
     FPowerpointLeft, FPowerpointTop, FPowerPointHeight, FPowerPointWidth : integer;
     FShowErrorItems: Boolean;
     FTestPresentation : OLEVariant;
+    MRUMenuManager: TMRUMenuManager;
 
     procedure AddPresentation(const AFileName: String);
 
@@ -2418,6 +2418,18 @@ var
   bmp: TBitmap;
   h: Integer;
 begin
+  MRUMenuManager := TMRUMenuManager.Create(self);
+  with MRUMenuManager do
+  begin
+    MaxRecent := 16;
+    MenuItem := mnuOpenRecent;
+    PopupMenu := RecentFilesPopup;
+    IniFileName := './pptex.ini';
+    IniSection := 'RecentFiles';
+    MenuCaptionMask := '%0:x -  %1:s';
+    OnRecentFile := MRUMenuManagerRecentFile;
+  end;
+
   FActSlideID := -1;
 
   ReadIni;

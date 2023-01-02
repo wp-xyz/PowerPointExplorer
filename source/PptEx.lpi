@@ -26,9 +26,6 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="lazmrumenu"/>
-      </Item>
-      <Item>
         <PackageName Value="LCL"/>
       </Item>
     </RequiredPackages>
